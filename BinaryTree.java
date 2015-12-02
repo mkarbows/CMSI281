@@ -13,6 +13,7 @@ public class BinaryTree implements Iterable {
     public BinaryTree() {
         //constructs an empty tree
         owner = this;
+        size = 0;
     }
 
     public BinaryTree(Object data) {
@@ -26,7 +27,7 @@ public class BinaryTree implements Iterable {
     private BinaryTree(Node r) {
         this.root = r;
         this.cursor = r;
-        for (Object n: this) {//*****************************************
+        for (Object n : this) {
             size++;
         }
     }
@@ -34,38 +35,37 @@ public class BinaryTree implements Iterable {
     public boolean contains(Object obj) {
         //returns true iff the tree contains an object equivalent to obj
     	for (Object o : this) {
-    		if (((Node) o).data().equals(obj)) {
+    		if (o.equals(obj)) {
     			return true;
     		}
     	}
         return false;
     }
 
+    
     public boolean similar(Object obj) {
         //returns true iff obj is a similar binary tree- i.e., obj must have identical structure (only)
     	if (!(obj instanceof BinaryTree)) {
     		return false;
     	}
     	BinaryTree bt = (BinaryTree) obj;
-    	Iterator it1 = this.iterator();
-    	Iterator it2 = bt.iterator();
+    	Iterator it1 = this.nodeIterator();
+    	Iterator it2 = bt.nodeIterator();
     	
-    	if (this.size() != bt.size()) {
-    		System.out.println("---0");
+        if (this.size() != bt.size()) {
     		return false;
     	}
     	
     	while (it1.hasNext()) {
-    		Node n1 = (Node) it1.next();
-    		Node n2 = (Node) it2.next();
+            Node n1 = (Node) it1.next();
+            Node n2 = (Node) it2.next();
+    		
     		if ((n1.left() == null && n2.left() != null) || (n1.left() != null && n2.left() == null)) {
-    			System.out.println("---1");
     			return false;
     		}
     		if ((n1.right() == null && n2.right() != null) || (n1.right() != null && n2.right() == null)) {
-    			System.out.println("---2");
     			return false;
-    		}
+    		} 
     	}  	
         return true;
     }
@@ -88,28 +88,21 @@ public class BinaryTree implements Iterable {
         }
 
         // Checks preorder
-        while(itThis.hasNext() && itOther.hasNext()) {
-            nThis = (Node) itThis.next();
-            nOther = (Node) itOther.next();
-            
-            if (!nThis.data().equals(nOther.data())) {
+        while(itThis.hasNext() && itOther.hasNext()) {    
+            if (!itThis.next().equals(itOther.next())) {
                 return false;
             }
         }
 
-        itThis = inOrder();
-        itOther = bT.inOrder();
+        itThis = inOIterator();
+        itOther = bT.inOIterator();
 
         // Checks inorder
         while(itThis.hasNext() && itOther.hasNext()) {
-            nThis = (Node) itThis.next();
-            nOther = (Node) itOther.next();
-            
-            if (!nThis.data().equals(nOther.data())) {
+            if (!itThis.next().equals(itOther.next())) {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -126,131 +119,329 @@ public class BinaryTree implements Iterable {
         return super.hashCode();
     }
 
+    public Iterator nodeIterator() {
+        return new nodeIterator();
+    }
+
     public Iterator iterator() {
-        return preOrder();
+        return new myIterator();
     }
 
-    private Iterator preOrder() {
-        //should return a preorder iterator over the tree
-        return new Iterator() {
-            Node node;
-            int count = 0;
-
-            public void remove() {
-            	throw new UnsupportedOperationException();
-            }
-
-            public Object next() {
-
-                if(node == null) {
-                    node = owner.root;
-                    count++;
-                    return node;
-                }
-                if(node.left() !=  null) {
-                    node = node.left();
-                    count++;
-                    return node;
-                }
-                if(node.right() != null) {
-                    node = node.right();
-                    count++;
-                    return node;
-                }
-
-                Object prevNode = node;
-                node = node.parent();
-                while(true) {
-                    if(node.right() == prevNode) {
-                        prevNode = node;
-                        node = node.parent();
-                        continue;
-                    }
-                    if(node.left() == prevNode) {
-                        if(node.right() != null) {
-                            node = node.right();
-                            count++;
-                            return node;
-                        }
-                        prevNode = node;
-                        node = node.parent();
-                        continue;
-                    }
-                }
-            }
-
-            public boolean hasNext() {
-                // this isnt really the "right way", TODO: make suck less
-                //System.out.println("hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + owner.size() + " " + (count + 1));
-                return owner.size() != count;
-            }
-        };
+    public Iterator inOIterator() {
+        return new myInOIterator();
     }
 
-    public Iterator inOrder() {
-        return new Iterator() {
-            Node node;
-            int count = 0;
-            Stack<Object> stack = new Stack<Object>();
+    public class nodeIterator implements Iterator {
+        //iterator only returning the nodes, not the data
+        Node node;
+        int count = 0;
+        Stack<Object> stack = new Stack<Object>();
 
-            public void remove() {
-            	throw new UnsupportedOperationException();
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Object next() {
+            if (node == null) {
+                node = owner.root;
+                count++;
+                stack.push(node);
+                return node;
             }
-
-            
-            public Object next() {
-                //should return an inorder iterator over the tree
-
-                if(node == null) {
-                    node = owner.root;
-                }
-
-                Object prevNode = node;
-                while (true) {
-                    if (prevNode == node.right()) {
-                        prevNode = node;
-                        node = node.parent();
-                        continue;
-                    }
-                    
-                    if (prevNode == node && node.left() == null && node.right() == null) {
-                    	node = node.parent();
-                    	continue;
-                    }
-
-                    if ((stack.isEmpty() || node != stack.peek()) && node.left() != null) {
-                    	prevNode = node;
-                        stack.push(prevNode);
+            while (true) {
+                if (stack.peek() == node) {
+                    if (node.left() != null) {
                         node = node.left();
-                        continue;
-                    }
-                    if (node.left() == null && prevNode == node.parent()) {
-                    	count++;
+                        count++;
+                        stack.push(node);
                         return node;
                     }
-
-                    if (prevNode == node.left()) {
-                    	count++;
-                        return node;
-                    }
-
                     if (node.right() != null) {
-                    	if((stack.isEmpty() || node == stack.peek())) {
-                            stack.pop();
-                    	}
-                        prevNode = node;
+                        node = node.right();
+                        count++;
+                        stack.push(node);
+                        return node;
+                    }
+                    node = node.parent();
+                    continue;
+                }
+                if (stack.peek() == node.left()) {
+                    if (node.right() != null) {
+                        node = node.right();
+                        count++;
+                        stack.pop();
+                        stack.push(node);
+                        return node;
+                    }
+                    node = node.parent();
+                    continue;
+                }
+                if (stack.peek() == node.right()) {
+                    stack.pop();
+                    node = node.parent();
+                    continue;
+                }
+            }
+        }
+
+        public boolean hasNext() {
+            return owner.size() != count;
+        }
+    }
+
+    public class myIterator implements Iterator {
+        //preorder
+        Node node;
+        int count = 0;
+        Stack<Object> stack = new Stack<Object>();
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Object next() {
+            if (node == null) {
+                node = owner.root;
+                count++;
+                stack.push(node);
+                return node.data;
+            }
+            while (true) {
+                if (stack.peek() == node) {
+                    if (node.left() != null) {
+                        node = node.left();
+                        count++;
+                        stack.push(node);
+                        return node.data();
+                    }
+                    if (node.right() != null) {
+                        node = node.right();
+                        count++;
+                        stack.push(node);
+                        return node.data();
+                    }
+                    node = node.parent();
+                    continue;
+                }
+                if (stack.peek() == node.left()) {
+                    if (node.right() != null) {
+                        node = node.right();
+                        count++;
+                        stack.pop();
+                        stack.push(node);
+                        return node.data();
+                    }
+                    node = node.parent();
+                    continue;
+                }
+                if (stack.peek() == node.right()) {
+                    stack.pop();
+                    node = node.parent();
+                    continue;
+                }
+            }
+        }
+
+        public boolean hasNext() {
+            return owner.size() != count;
+        }
+    }
+
+    // private Iterator preOrder() {
+    //     //should return a preorder iterator over the tree
+    //     return new Iterator() {
+    //         Iterator it = owner.preOrderNode();
+
+    //         public void remove() {
+    //             throw new UnsupportedOperationException();
+    //         }
+
+    //         public Object next() {
+    //             return ((Node) it.next()).data();
+    //         }
+
+    //         public boolean hasNext() {
+    //             return it.hasNext();
+    //         }
+    //     };
+    // }
+
+    // private Iterator preOrderNode() {
+    //     return new Iterator() {
+            
+    //         public void remove() {
+    //         	throw new UnsupportedOperationException();
+    //         }
+
+    //         Node node;
+    //         int count = 0;
+    //         Stack<Object> stack = new Stack<Object>();
+
+    //         public Object next() {
+    //             if (node == null) {
+    //                 node = owner.root;
+    //                 count++;
+    //                 stack.push(node);
+    //                 return node;
+    //             }
+    //             while (true) {
+    //                 if (stack.peek() == node) {
+    //                     if (node.left() != null) {
+    //                         node = node.left();
+    //                         count++;
+    //                         stack.push(node);
+    //                         return node;
+    //                     }
+    //                     if (node.right() != null) {
+    //                         node = node.right();
+    //                         count++;
+    //                         stack.push(node);
+    //                         return node;
+    //                     }
+    //                     node = node.parent();
+    //                     continue;
+    //                 }
+    //                 if (stack.peek() == node.left()) {
+    //                     if (node.right() != null) {
+    //                         node = node.right();
+    //                         count++;
+    //                         stack.pop();
+    //                         stack.push(node);
+    //                         return node;
+    //                     }
+    //                     node = node.parent();
+    //                     continue;
+    //                 }
+    //                 if (stack.peek() == node.right()) {
+    //                     stack.pop();
+    //                     node = node.parent();
+    //                     continue;
+    //                 }
+    //             }
+    //         }
+
+    //         public boolean hasNext() {
+    //             return owner.size() != count;
+    //         }
+    //     };
+    // }
+
+    public class myInOIterator implements Iterator {
+        Node node;
+        int count = 0;
+        Stack<Object> stack = new Stack<Object>();
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Object next() {
+            if (node == null) {
+                node = owner.root;
+            }
+            while (true) {
+                if (stack.size() > 0 && stack.peek() == node.left()) { //just finished the left side of a node
+                    count++;
+                    stack.pop();
+                    stack.push(node);
+                    return node.data();
+                }
+                if (stack.size() > 0 && stack.peek() == node) { //retured it last time so do the right side.
+                    if (node.right() != null) {
                         node = node.right();
                         continue;
                     }
+                    node = node.parent();
+                    continue;
                 }
+                if (stack.size() > 0 && stack.peek() == node.right()) { // we just finished the right side so go up
+                    stack.pop();
+                    node = node.parent();
+                    continue;
+                }
+                if (node.left() != null) { // keep going left
+                    node = node.left();
+                    continue;
+                }
+                count++;
+                stack.push(node);
+                return node.data();
             }
+        }
 
-            public boolean hasNext() {
-                // this isnt really the "right way", TODO: make suck less
-                return owner.size() != count;
-            }
-        };
+        public boolean hasNext() {
+            return owner.size() != count;
+        }        
     }
+
+    // public Iterator inOrder() {
+    //     //should return an inorder iterator over the tree
+    //     return new Iterator() {
+    //         Iterator it = owner.inOrderNode();
+
+    //         public void remove() {
+    //             throw new UnsupportedOperationException();
+    //         }
+
+    //         public Object next() {
+    //             return ((Node) it.next()).data();
+    //         }
+
+    //         public boolean hasNext() {
+    //             return it.hasNext();
+    //         }
+    //     };
+    // }
+
+    // private Iterator inOrderNode() {
+    //     return new Iterator() {
+    //         Node node;
+    //         int count = 0;
+    //         Stack<Object> stack = new Stack<Object>();
+
+    //         public void remove() {
+    //         	throw new UnsupportedOperationException();
+    //         }
+
+    //         public Object next() {
+    //             if (node == null) {
+    //                 node = owner.root;
+    //             }
+    //             while (true) {
+    //                 if (stack.size() > 0 && stack.peek() == node.left()) {
+    //                     count++;
+    //                     stack.pop();
+    //                     stack.push(node);
+    //                     return node;
+    //                 }
+    //                 if (stack.size() > 0 && stack.peek() == node) {
+    //                     if (node.right() != null) {
+    //                         node = node.right();
+    //                         continue;
+    //                     }
+    //                     node = node.parent();
+    //                     continue;
+    //                 }
+    //                 if (stack.size() > 0 && stack.peek() == node.right()) {
+    //                     stack.pop();
+    //                     node = node.parent();
+    //                     continue;
+    //                 }
+    //                 if (node.left() != null) {
+    //                     node = node.left();
+    //                     continue;
+    //                 }
+    //                 count++;
+    //                 stack.push(node);
+    //                 return node;
+    //             }
+    //         }
+
+    //         public boolean hasNext() {
+    //             return owner.size() != count;
+    //         }
+    //     };
+    // }
 
     public boolean putCursorAtRoot() {
         //returns false if this is an empty tree
@@ -262,7 +453,7 @@ public class BinaryTree implements Iterable {
     }
 
     public boolean putCursorAtLeftSon() {
-        if (cursor.left() == null) {
+        if (this.isEmpty() && cursor.left() == null) {
             return false;
         }
         cursor = cursor.left();
@@ -270,7 +461,7 @@ public class BinaryTree implements Iterable {
     }
 
     public boolean putCursorAtRightSon() {
-        if (cursor.right() == null) {
+        if (this.isEmpty() && cursor.right() == null) {
             return false;
         }
         cursor = cursor.right();
@@ -278,7 +469,7 @@ public class BinaryTree implements Iterable {
     }
 
     public boolean putCursorAtFather() {
-        if (cursor == root) {
+        if (this.isEmpty() && cursor == root) {
             return false;
         }
         cursor = cursor.parent();
@@ -336,7 +527,6 @@ public class BinaryTree implements Iterable {
         private Node lSon;
         private Node rSon;
 
-
         public Node(Object data) {
             this.data = data;
         }
@@ -372,7 +562,6 @@ public class BinaryTree implements Iterable {
         public void parent(Node newParent) {
             this.parent = newParent;
         }
-
     }
 
 
@@ -380,9 +569,11 @@ public class BinaryTree implements Iterable {
         attempts = 0;
         successes = 0;
 
+
         test_Iterator();
         test_Similar();
         test_Contains();
+        test_Equals();
 
         System.out.println(successes + "/" + attempts + " tests passed.");
     }
@@ -391,6 +582,46 @@ public class BinaryTree implements Iterable {
         attempts++;
         successes += value ? 1 : 0;
         System.out.println(value ? "success" : "failure");
+    }
+
+    private static void test_Iterator() {
+        System.out.println("Testing iterator...");        
+
+        BinaryTree bt = new BinaryTree("a");
+        bt.putCursorAtRoot();
+        bt.attachLeftSonAtCursor("b");
+        bt.attachRightSonAtCursor("c");
+        bt.putCursorAtRightSon();
+        bt.attachLeftSonAtCursor("d");
+        bt.attachRightSonAtCursor("e");
+        bt.putCursorAtRightSon();
+        bt.attachLeftSonAtCursor("f");
+        bt.attachRightSonAtCursor("g");
+        
+        Iterator it = bt.inOIterator();
+        
+        //preorder
+        // System.out.println(it.next()); // a
+        // System.out.println(it.next()); // b
+        // System.out.println(it.next()); // c
+        // System.out.println(it.next()); // d
+        // System.out.println(it.next()); // e
+        // System.out.println(it.next()); // f
+        // System.out.println(it.next()); // g
+
+        String s = "badcfeg";
+        String t = "";
+        Object o = null;
+        while (it.hasNext()) {
+            o = it.next();
+            t += o.toString();
+        }
+
+        try {
+            displaySuccessIfTrue(s.equals(t));
+        } catch (Exception e) {
+            displaySuccessIfTrue(false);
+        }        
     }
 
     private static void test_Similar() {
@@ -428,14 +659,14 @@ public class BinaryTree implements Iterable {
         bt2.attachRightSonAtCursor("a");
         
         try {
-            displaySuccessIfTrue(bt2.contains("n"));
+            displaySuccessIfTrue(bt2.contains("f"));
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }
     }
     
-    private static void test_Iterator() {
-        System.out.println("Testing iterator...");        
+    private static void test_Equals() {
+        System.out.println("Testing equals...");
 
         BinaryTree bt = new BinaryTree("a");
         bt.putCursorAtRoot();
@@ -447,39 +678,22 @@ public class BinaryTree implements Iterable {
         bt.putCursorAtRightSon();
         bt.attachLeftSonAtCursor("f");
         bt.attachRightSonAtCursor("g");
-        
-        Iterator it = bt.iterator();
-        
-        System.out.println(((Node)it.next()).data()); // a
-        System.out.println(((Node)it.next()).data()); // b
-        System.out.println(((Node)it.next()).data()); // c
-        System.out.println(((Node)it.next()).data()); // d
-        
-        it.remove();
-        System.out.println("--------");
-      //System.out.println(((Node)it.next()).data()); // e
-        System.out.println(((Node)it.next()).data()); // e
-        System.out.println(((Node)it.next()).data()); // f
-        System.out.println(((Node)it.next()).data()); // g
-        
-        Iterator it2 = bt.iterator();
-        System.out.println(((Node)it2.next()).data()); // a
-        System.out.println(((Node)it2.next()).data()); // b
-        System.out.println(((Node)it2.next()).data()); // c
-        System.out.println(((Node)it2.next()).data()); // e
-        System.out.println(((Node)it2.next()).data()); // f
-        System.out.println(((Node)it2.next()).data()); // g
-        //System.out.print(((Node)it.next()).data() + ", ");
-        /*try {
-            displaySuccessIfTrue(deque.size() == 0);
+
+        BinaryTree bt2 = new BinaryTree("a");
+        bt2.putCursorAtRoot();
+        bt2.attachLeftSonAtCursor("b");
+        bt2.attachRightSonAtCursor("c");
+        bt2.putCursorAtRightSon();
+        bt2.attachLeftSonAtCursor("d");
+        bt2.attachRightSonAtCursor("e");
+        bt2.putCursorAtRightSon();
+        bt2.attachLeftSonAtCursor("f");
+        bt2.attachRightSonAtCursor("g");
+
+        try {
+            displaySuccessIfTrue(bt.equals(bt2));
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }
-        try {
-            displaySuccessIfTrue(deque.leftMost == null && deque.rightMost == null);
-        } catch (Exception e) {
-            displaySuccessIfTrue(false);
-        }*/
     }
-
 }
