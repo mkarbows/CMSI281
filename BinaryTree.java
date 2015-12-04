@@ -342,12 +342,12 @@ public class BinaryTree implements Iterable {
             return false;
         }
 
-        // if (this.size() == 0) { // uncomment if want to add nodes to empty tree
-        //     this.root = new Node(data);
-        //     cursor = root;
-        //     size++;
-        //     return true;
-        // }
+        if (this.size() == 0) { // for adding nodes to empty tree
+            this.root = new Node(data);
+            cursor = root;
+            size++;
+            return true;
+        }
 
         if (cursor.left() == null) {
             cursor.left(new Node(data));
@@ -364,12 +364,12 @@ public class BinaryTree implements Iterable {
             return false;
         }
 
-        // if (this.size() == 0) { // uncomment if want to add nodes to empty tree
-        //     this.root = new Node(data);
-        //     cursor = root;
-        //     size++;
-        //     return true;
-        // }
+        if (this.size() == 0) { // for adding nodes to empty tree
+            this.root = new Node(data);
+            cursor = root;
+            size++;
+            return true;
+        }
 
         if (cursor.right() == null) {
             cursor.right(new Node(data));
@@ -449,7 +449,7 @@ public class BinaryTree implements Iterable {
         attempts = 0;
         successes = 0;
 
-        //test_Constructor();
+        test_Constructor();
         test_Iterator();
         test_Similar();
         test_Contains();
@@ -466,23 +466,23 @@ public class BinaryTree implements Iterable {
         System.out.println(value ? "success" : "failure");
     }
 
-    // private static void test_Constructor() {  // tests constructing empty binary tree where nodes are attached
-    //     System.out.println("Testing constructors...");
+    private static void test_Constructor() {  //constructing empty binary tree where nodes are attached
+        System.out.println("Testing constructors...");
 
-    //     BinaryTree bt = new BinaryTree();
-    //     bt.putCursorAtRoot();
-    //     bt.attachLeftSonAtCursor("a");
+        BinaryTree bt = new BinaryTree();
+        bt.putCursorAtRoot();
+        bt.attachLeftSonAtCursor("a");
 
-    //     BinaryTree bt2 = new BinaryTree();
-    //     bt.putCursorAtRoot();
-    //     bt.attachRightSonAtCursor("a");
+        BinaryTree bt2 = new BinaryTree();
+        bt2.putCursorAtRoot();
+        bt2.attachRightSonAtCursor("a");
 
-    //     try {
-    //         displaySuccessIfTrue(bt2.contains("a"));
-    //     } catch (Exception e) {
-    //         displaySuccessIfTrue(false);
-    //     }
-    // }
+        try {
+            displaySuccessIfTrue(bt2.contains("a"));
+        } catch (Exception e) {
+            displaySuccessIfTrue(false);
+        }
+    }
 
     private static void test_Iterator() {
         System.out.println("Testing iterator...");        
