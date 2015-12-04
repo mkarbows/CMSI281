@@ -20,7 +20,7 @@ public class BinaryTree implements Iterable {
         //constructs a tree with just a root node decorated with (i.e., referring to) obj
         this.root = new Node(data);
         this.cursor = root;
-        this.size = 1;
+        size++;
         owner = this;
     }
 
@@ -35,7 +35,7 @@ public class BinaryTree implements Iterable {
     public boolean contains(Object obj) {
         //returns true iff the tree contains an object equivalent to obj
     	for (Object o : this) {
-    		if (o.equals(obj)) {
+    		if (o == obj) {
     			return true;
     		}
     	}
@@ -80,9 +80,6 @@ public class BinaryTree implements Iterable {
         Iterator itThis = this.iterator();
         Iterator itOther = bT.iterator();
 
-        Node nThis = null; 
-        Node nOther = null; 
-
         if (size() != bT.size()) {
             return false;
         }
@@ -94,8 +91,8 @@ public class BinaryTree implements Iterable {
             }
         }
 
-        itThis = inOIterator();
-        itOther = bT.inOIterator();
+        itThis = inOrder();
+        itOther = bT.inOrder();
 
         // Checks inorder
         while(itThis.hasNext() && itOther.hasNext()) {
@@ -107,7 +104,6 @@ public class BinaryTree implements Iterable {
     }
 
     public boolean isEmpty() {
-        //should do the obvious thing- and the same for public int size() and public int hashCode()
         return size == 0;
     }
 
@@ -127,14 +123,14 @@ public class BinaryTree implements Iterable {
         return new myIterator();
     }
 
-    public Iterator inOIterator() {
-        return new myInOIterator();
+    public Iterator inOrder() {
+        return new myinOrder();
     }
 
     public class nodeIterator implements Iterator {
         //iterator only returning the nodes, not the data
         Node node;
-        int count = 0;
+        int size = 0;
         Stack<Object> stack = new Stack<Object>();
 
         public void remove() {
@@ -144,7 +140,7 @@ public class BinaryTree implements Iterable {
         public Object next() {
             if (node == null) {
                 node = owner.root;
-                count++;
+                size++;
                 stack.push(node);
                 return node;
             }
@@ -152,13 +148,13 @@ public class BinaryTree implements Iterable {
                 if (stack.peek() == node) {
                     if (node.left() != null) {
                         node = node.left();
-                        count++;
+                        size++;
                         stack.push(node);
                         return node;
                     }
                     if (node.right() != null) {
                         node = node.right();
-                        count++;
+                        size++;
                         stack.push(node);
                         return node;
                     }
@@ -168,7 +164,7 @@ public class BinaryTree implements Iterable {
                 if (stack.peek() == node.left()) {
                     if (node.right() != null) {
                         node = node.right();
-                        count++;
+                        size++;
                         stack.pop();
                         stack.push(node);
                         return node;
@@ -185,14 +181,14 @@ public class BinaryTree implements Iterable {
         }
 
         public boolean hasNext() {
-            return owner.size() != count;
+            return owner.size() != size;
         }
     }
 
     public class myIterator implements Iterator {
         //preorder
         Node node;
-        int count = 0;
+        int size = 0;
         Stack<Object> stack = new Stack<Object>();
 
         public void remove() {
@@ -202,7 +198,7 @@ public class BinaryTree implements Iterable {
         public Object next() {
             if (node == null) {
                 node = owner.root;
-                count++;
+                size++;
                 stack.push(node);
                 return node.data;
             }
@@ -210,13 +206,13 @@ public class BinaryTree implements Iterable {
                 if (stack.peek() == node) {
                     if (node.left() != null) {
                         node = node.left();
-                        count++;
+                        size++;
                         stack.push(node);
                         return node.data();
                     }
                     if (node.right() != null) {
                         node = node.right();
-                        count++;
+                        size++;
                         stack.push(node);
                         return node.data();
                     }
@@ -226,7 +222,7 @@ public class BinaryTree implements Iterable {
                 if (stack.peek() == node.left()) {
                     if (node.right() != null) {
                         node = node.right();
-                        count++;
+                        size++;
                         stack.pop();
                         stack.push(node);
                         return node.data();
@@ -238,97 +234,18 @@ public class BinaryTree implements Iterable {
                     stack.pop();
                     node = node.parent();
                     continue;
-                }
+                }                
             }
         }
 
         public boolean hasNext() {
-            return owner.size() != count;
+            return owner.size() != size;
         }
     }
 
-    // private Iterator preOrder() {
-    //     //should return a preorder iterator over the tree
-    //     return new Iterator() {
-    //         Iterator it = owner.preOrderNode();
-
-    //         public void remove() {
-    //             throw new UnsupportedOperationException();
-    //         }
-
-    //         public Object next() {
-    //             return ((Node) it.next()).data();
-    //         }
-
-    //         public boolean hasNext() {
-    //             return it.hasNext();
-    //         }
-    //     };
-    // }
-
-    // private Iterator preOrderNode() {
-    //     return new Iterator() {
-            
-    //         public void remove() {
-    //         	throw new UnsupportedOperationException();
-    //         }
-
-    //         Node node;
-    //         int count = 0;
-    //         Stack<Object> stack = new Stack<Object>();
-
-    //         public Object next() {
-    //             if (node == null) {
-    //                 node = owner.root;
-    //                 count++;
-    //                 stack.push(node);
-    //                 return node;
-    //             }
-    //             while (true) {
-    //                 if (stack.peek() == node) {
-    //                     if (node.left() != null) {
-    //                         node = node.left();
-    //                         count++;
-    //                         stack.push(node);
-    //                         return node;
-    //                     }
-    //                     if (node.right() != null) {
-    //                         node = node.right();
-    //                         count++;
-    //                         stack.push(node);
-    //                         return node;
-    //                     }
-    //                     node = node.parent();
-    //                     continue;
-    //                 }
-    //                 if (stack.peek() == node.left()) {
-    //                     if (node.right() != null) {
-    //                         node = node.right();
-    //                         count++;
-    //                         stack.pop();
-    //                         stack.push(node);
-    //                         return node;
-    //                     }
-    //                     node = node.parent();
-    //                     continue;
-    //                 }
-    //                 if (stack.peek() == node.right()) {
-    //                     stack.pop();
-    //                     node = node.parent();
-    //                     continue;
-    //                 }
-    //             }
-    //         }
-
-    //         public boolean hasNext() {
-    //             return owner.size() != count;
-    //         }
-    //     };
-    // }
-
-    public class myInOIterator implements Iterator {
+    public class myinOrder implements Iterator {
         Node node;
-        int count = 0;
+        int size = 0;
         Stack<Object> stack = new Stack<Object>();
 
         public void remove() {
@@ -341,7 +258,7 @@ public class BinaryTree implements Iterable {
             }
             while (true) {
                 if (stack.size() > 0 && stack.peek() == node.left()) { //just finished the left side of a node
-                    count++;
+                    size++;
                     stack.pop();
                     stack.push(node);
                     return node.data();
@@ -363,85 +280,16 @@ public class BinaryTree implements Iterable {
                     node = node.left();
                     continue;
                 }
-                count++;
+                size++;
                 stack.push(node);
                 return node.data();
             }
         }
 
         public boolean hasNext() {
-            return owner.size() != count;
+            return owner.size() != size;
         }        
     }
-
-    // public Iterator inOrder() {
-    //     //should return an inorder iterator over the tree
-    //     return new Iterator() {
-    //         Iterator it = owner.inOrderNode();
-
-    //         public void remove() {
-    //             throw new UnsupportedOperationException();
-    //         }
-
-    //         public Object next() {
-    //             return ((Node) it.next()).data();
-    //         }
-
-    //         public boolean hasNext() {
-    //             return it.hasNext();
-    //         }
-    //     };
-    // }
-
-    // private Iterator inOrderNode() {
-    //     return new Iterator() {
-    //         Node node;
-    //         int count = 0;
-    //         Stack<Object> stack = new Stack<Object>();
-
-    //         public void remove() {
-    //         	throw new UnsupportedOperationException();
-    //         }
-
-    //         public Object next() {
-    //             if (node == null) {
-    //                 node = owner.root;
-    //             }
-    //             while (true) {
-    //                 if (stack.size() > 0 && stack.peek() == node.left()) {
-    //                     count++;
-    //                     stack.pop();
-    //                     stack.push(node);
-    //                     return node;
-    //                 }
-    //                 if (stack.size() > 0 && stack.peek() == node) {
-    //                     if (node.right() != null) {
-    //                         node = node.right();
-    //                         continue;
-    //                     }
-    //                     node = node.parent();
-    //                     continue;
-    //                 }
-    //                 if (stack.size() > 0 && stack.peek() == node.right()) {
-    //                     stack.pop();
-    //                     node = node.parent();
-    //                     continue;
-    //                 }
-    //                 if (node.left() != null) {
-    //                     node = node.left();
-    //                     continue;
-    //                 }
-    //                 count++;
-    //                 stack.push(node);
-    //                 return node;
-    //             }
-    //         }
-
-    //         public boolean hasNext() {
-    //             return owner.size() != count;
-    //         }
-    //     };
-    // }
 
     public boolean putCursorAtRoot() {
         //returns false if this is an empty tree
@@ -453,7 +301,7 @@ public class BinaryTree implements Iterable {
     }
 
     public boolean putCursorAtLeftSon() {
-        if (this.isEmpty() && cursor.left() == null) {
+        if (this.isEmpty() || cursor.left() == null) {
             return false;
         }
         cursor = cursor.left();
@@ -461,7 +309,7 @@ public class BinaryTree implements Iterable {
     }
 
     public boolean putCursorAtRightSon() {
-        if (this.isEmpty() && cursor.right() == null) {
+        if (this.isEmpty() || cursor.right() == null) {
             return false;
         }
         cursor = cursor.right();
@@ -469,7 +317,7 @@ public class BinaryTree implements Iterable {
     }
 
     public boolean putCursorAtFather() {
-        if (this.isEmpty() && cursor == root) {
+        if (this.isEmpty() || cursor == root) {
             return false;
         }
         cursor = cursor.parent();
@@ -499,26 +347,25 @@ public class BinaryTree implements Iterable {
     }
 
     public boolean pruneFromCursor() {
-        //removes everything that descends from the cursor, including the node to which the cursor refers, 
-        //then relocates the cursor to the root node, returning true iff something (including the cursor) changed
-        if (size == 0) {
+        if (cursor == null) {
             return false;
         }
-        Node oldCursor = cursor;
-        if (cursor == root) {
-            cursor = null;
-            root = null;
-            size = 0;
-        } else {
+        size -= trim(cursor);
+        if (cursor.parent() != null) {
+            Node oldCursor = cursor;
             cursor = cursor.parent();
             if (cursor.left() == oldCursor) {
                 cursor.left(null);
             } else {
                 cursor.right(null);
-            }       
-            size -= (new BinaryTree(oldCursor)).size();
+            }  
         }
+        cursor = root;  
         return true;
+    }
+
+    public int trim(Node node) {
+        return 1 + (node.left() != null ? trim(node.left()) : 0) + (node.right() != null ? trim(node.right()) : 0);
     }
 
     private class Node {
@@ -564,16 +411,16 @@ public class BinaryTree implements Iterable {
         }
     }
 
-
     public static void main(String[] args) {
         attempts = 0;
         successes = 0;
-
 
         test_Iterator();
         test_Similar();
         test_Contains();
         test_Equals();
+        test_Prune();
+        test_size();
 
         System.out.println(successes + "/" + attempts + " tests passed.");
     }
@@ -598,17 +445,18 @@ public class BinaryTree implements Iterable {
         bt.attachLeftSonAtCursor("f");
         bt.attachRightSonAtCursor("g");
         
-        Iterator it = bt.inOIterator();
+        Iterator it = bt.inOrder();
         
         //preorder
         // System.out.println(it.next()); // a
         // System.out.println(it.next()); // b
         // System.out.println(it.next()); // c
         // System.out.println(it.next()); // d
-        // System.out.println(it.next()); // e
+        // System.out.println(it.next()); // null
         // System.out.println(it.next()); // f
         // System.out.println(it.next()); // g
 
+        //preorder 
         String s = "badcfeg";
         String t = "";
         Object o = null;
@@ -631,35 +479,60 @@ public class BinaryTree implements Iterable {
         bt.putCursorAtRoot();
         bt.attachLeftSonAtCursor("b");
         bt.attachRightSonAtCursor("c");
+        bt.putCursorAtLeftSon();
+        bt.attachRightSonAtCursor("h");
+        bt.putCursorAtRightSon();
+        bt.attachRightSonAtCursor("i");
+        bt.putCursorAtRightSon();
+        bt.attachRightSonAtCursor("i");
+        bt.putCursorAtRightSon();
+        bt.attachRightSonAtCursor("i");
+        bt.putCursorAtRightSon();
+        bt.attachRightSonAtCursor("i");
+        bt.putCursorAtRightSon();
+        bt.attachRightSonAtCursor("i");
         
         BinaryTree bt2 = new BinaryTree("e");
         bt2.putCursorAtRoot();
         bt2.attachLeftSonAtCursor("f");
         bt2.attachRightSonAtCursor("g");
+        bt2.putCursorAtLeftSon();
+        bt2.attachRightSonAtCursor("h");
+        bt2.putCursorAtRightSon();
+        bt2.attachRightSonAtCursor("i");
+        bt2.putCursorAtRightSon();
+        bt2.attachRightSonAtCursor("f");
+        bt2.putCursorAtRightSon();
+        bt2.attachRightSonAtCursor("i");
+        bt2.putCursorAtRightSon();
+        bt2.attachRightSonAtCursor("i");
+        bt2.putCursorAtRightSon();
+        bt2.attachRightSonAtCursor(null);
         
         try {
             displaySuccessIfTrue(bt.similar(bt2));
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }
-    	
     }
     
     private static void test_Contains() {
     	System.out.println("Testing contains...");
     	
-    	BinaryTree bt = new BinaryTree("a");
+    	BinaryTree bt = new BinaryTree(8L);
         bt.putCursorAtRoot();
         bt.attachLeftSonAtCursor("b");
-        bt.attachRightSonAtCursor("c");
+        bt.attachRightSonAtCursor("k");
         
         BinaryTree bt2 = new BinaryTree("e");
         bt2.putCursorAtRoot();
         bt2.attachLeftSonAtCursor("f");
-        bt2.attachRightSonAtCursor("a");
+        bt2.attachRightSonAtCursor((BinaryTree) bt);
+        bt2.putCursorAtRightSon();
+        bt2.pruneFromCursor();
         
         try {
-            displaySuccessIfTrue(bt2.contains("f"));
+            displaySuccessIfTrue(bt.contains(8L));
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }
@@ -687,11 +560,56 @@ public class BinaryTree implements Iterable {
         bt2.attachLeftSonAtCursor("d");
         bt2.attachRightSonAtCursor("e");
         bt2.putCursorAtRightSon();
+        bt2.pruneFromCursor();
         bt2.attachLeftSonAtCursor("f");
         bt2.attachRightSonAtCursor("g");
 
         try {
+            displaySuccessIfTrue(!(bt.equals(bt2)));
+        } catch (Exception e) {
+            displaySuccessIfTrue(false);
+        }
+    }
+
+    private static void test_Prune() {
+        System.out.println("Testing prune...");
+        BinaryTree bt = new BinaryTree("a");
+        bt.putCursorAtRoot();
+        bt.attachLeftSonAtCursor("b");
+        bt.attachRightSonAtCursor("c");
+        bt.putCursorAtRightSon();
+        bt.attachLeftSonAtCursor("d");
+        bt.attachRightSonAtCursor("e");
+        bt.putCursorAtRightSon();
+        bt.attachLeftSonAtCursor("f");
+        bt.attachRightSonAtCursor("g");
+        bt.pruneFromCursor();
+
+        BinaryTree bt2 = new BinaryTree("a");
+        bt2.putCursorAtRoot();
+        bt2.attachLeftSonAtCursor("b");
+        bt2.attachRightSonAtCursor("c");
+        bt2.putCursorAtRightSon();
+        bt2.attachLeftSonAtCursor("d");
+
+        try {
             displaySuccessIfTrue(bt.equals(bt2));
+        } catch (Exception e) {
+            displaySuccessIfTrue(false);
+        }
+    }
+
+    private static void test_size() {
+        System.out.println("Testing size...");
+        BinaryTree bt = new BinaryTree("a");
+        bt.putCursorAtRoot();
+        bt.attachLeftSonAtCursor("b");
+        bt.attachRightSonAtCursor("c");
+        bt.putCursorAtRightSon();
+        bt.attachLeftSonAtCursor("d");
+
+        try {
+            displaySuccessIfTrue(bt.size() == 4);
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }
