@@ -516,9 +516,28 @@ public class BinaryTree implements Iterable {
         bt2.attachRightSonAtCursor("i");
         bt2.putCursorAtRightSon();
         bt2.attachRightSonAtCursor(null);
+
+        BinaryTree bt3 = new BinaryTree("a");
+        bt3.putCursorAtRoot();
+        bt3.attachLeftSonAtCursor("b");
+        bt3.attachRightSonAtCursor("c");
+        bt3.putCursorAtRightSon();
+        bt3.attachLeftSonAtCursor("d");
+        bt3.attachRightSonAtCursor("e");
+        bt3.putCursorAtRightSon();
+        bt3.pruneFromCursor();
+        bt3.attachLeftSonAtCursor("f");
+        bt3.attachRightSonAtCursor("g");
+
+        BinaryTree bt4 = new BinaryTree("a");
+        bt4.putCursorAtRoot();
+        bt4.attachLeftSonAtCursor("b");
+        bt4.attachRightSonAtCursor("c");
+        bt4.putCursorAtRightSon();
+        bt4.attachLeftSonAtCursor("d");
         
         try {
-            displaySuccessIfTrue(bt.similar(bt2));
+            displaySuccessIfTrue(bt3.similar(bt4));
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }
@@ -555,9 +574,23 @@ public class BinaryTree implements Iterable {
         bt3.attachRightSonAtCursor("i");
         bt3.putCursorAtRightSon();
         bt3.attachRightSonAtCursor("i");
+
+        BinaryTree bt4 = new BinaryTree("a");
+        bt4.putCursorAtRoot();
+        bt4.attachLeftSonAtCursor("b");
+        bt4.attachRightSonAtCursor("c");
+        bt4.putCursorAtRightSon();
+        bt4.attachLeftSonAtCursor("d");
+        bt4.attachRightSonAtCursor("e");
+        bt4.putCursorAtRightSon();
+        bt4.pruneFromCursor();
+        bt4.attachLeftSonAtCursor("f");
+        bt4.attachRightSonAtCursor("g");
+        bt4.putCursorAtRightSon();
+        bt4.attachRightSonAtCursor("k");
         
         try {
-            displaySuccessIfTrue(bt.contains(8L)); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            displaySuccessIfTrue(bt4.contains("k"));
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }
@@ -633,8 +666,22 @@ public class BinaryTree implements Iterable {
         bt.putCursorAtRightSon();
         bt.attachLeftSonAtCursor("d");
 
+        BinaryTree bt2 = new BinaryTree("a");
+        bt2.putCursorAtRoot();
+        bt2.attachLeftSonAtCursor("b");
+        bt2.attachRightSonAtCursor("c");
+        bt2.putCursorAtRightSon();
+        bt2.attachLeftSonAtCursor("d");
+        bt2.attachRightSonAtCursor("e");
+        bt2.putCursorAtRightSon();
+        bt2.pruneFromCursor();
+        bt2.attachLeftSonAtCursor("f");
+        bt2.attachRightSonAtCursor("g");
+        bt2.putCursorAtRightSon();
+        bt2.attachRightSonAtCursor("k");
+
         try {
-            displaySuccessIfTrue(bt.size() == 4);
+            displaySuccessIfTrue(bt2.size() == 5);
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }
