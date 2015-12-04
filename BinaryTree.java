@@ -1,5 +1,7 @@
 import java.lang.Iterable;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Stack;
+import java.util.NoSuchElementException;
 
 public class BinaryTree implements Iterable {
     private static int attempts = 0;
@@ -196,6 +198,9 @@ public class BinaryTree implements Iterable {
         }
 
         public Object next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             if (node == null) {
                 node = owner.root;
                 size++;
@@ -253,6 +258,9 @@ public class BinaryTree implements Iterable {
         }
 
         public Object next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             if (node == null) {
                 node = owner.root;
             }
@@ -530,9 +538,26 @@ public class BinaryTree implements Iterable {
         bt2.attachRightSonAtCursor((BinaryTree) bt);
         bt2.putCursorAtRightSon();
         bt2.pruneFromCursor();
+
+        BinaryTree bt3 = new BinaryTree("a");
+        bt3.putCursorAtRoot();
+        bt3.attachLeftSonAtCursor("b");
+        bt3.attachRightSonAtCursor("c");
+        bt3.putCursorAtLeftSon();
+        bt3.attachRightSonAtCursor("h");
+        bt3.putCursorAtRightSon();
+        bt3.attachRightSonAtCursor("i");
+        bt3.putCursorAtRightSon();
+        bt3.attachRightSonAtCursor("i");
+        bt3.putCursorAtRightSon();
+        bt3.attachRightSonAtCursor("i");
+        bt3.putCursorAtRightSon();
+        bt3.attachRightSonAtCursor("i");
+        bt3.putCursorAtRightSon();
+        bt3.attachRightSonAtCursor("i");
         
         try {
-            displaySuccessIfTrue(bt.contains(8L));
+            displaySuccessIfTrue(bt.contains(8L)); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }
