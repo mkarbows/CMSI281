@@ -12,7 +12,7 @@ public class BinaryTree implements Iterable {
     private Node cursor;
     private BinaryTree owner;
 
-    public BinaryTree() {
+    public BinaryTree() { //assuming we can't add stuff to an empty binary tree
         //constructs an empty tree
         owner = this;
         size = 0;
@@ -84,6 +84,10 @@ public class BinaryTree implements Iterable {
 
         if (size() != bT.size()) {
             return false;
+        }
+
+        if (size() == 0 && bT.size() == 0) {
+            return true;
         }
 
         // Checks preorder
@@ -334,6 +338,17 @@ public class BinaryTree implements Iterable {
 
     public boolean attachLeftSonAtCursor(Object data) {
         //returns false if a left son already exists
+        if (cursor != null && cursor.left() != null) {
+            return false;
+        }
+
+        // if (this.size() == 0) { // uncomment if want to add nodes to empty tree
+        //     this.root = new Node(data);
+        //     cursor = root;
+        //     size++;
+        //     return true;
+        // }
+
         if (cursor.left() == null) {
             cursor.left(new Node(data));
             cursor.left().parent(cursor);
@@ -345,6 +360,17 @@ public class BinaryTree implements Iterable {
     
     public boolean attachRightSonAtCursor(Object data) {
         //returns false if a right son already exists
+        if (cursor != null && cursor.right() != null) {
+            return false;
+        }
+
+        // if (this.size() == 0) { // uncomment if want to add nodes to empty tree
+        //     this.root = new Node(data);
+        //     cursor = root;
+        //     size++;
+        //     return true;
+        // }
+
         if (cursor.right() == null) {
             cursor.right(new Node(data));
             cursor.right().parent(cursor);
@@ -423,6 +449,7 @@ public class BinaryTree implements Iterable {
         attempts = 0;
         successes = 0;
 
+        //test_Constructor();
         test_Iterator();
         test_Similar();
         test_Contains();
@@ -438,6 +465,24 @@ public class BinaryTree implements Iterable {
         successes += value ? 1 : 0;
         System.out.println(value ? "success" : "failure");
     }
+
+    // private static void test_Constructor() {  // tests constructing empty binary tree where nodes are attached
+    //     System.out.println("Testing constructors...");
+
+    //     BinaryTree bt = new BinaryTree();
+    //     bt.putCursorAtRoot();
+    //     bt.attachLeftSonAtCursor("a");
+
+    //     BinaryTree bt2 = new BinaryTree();
+    //     bt.putCursorAtRoot();
+    //     bt.attachRightSonAtCursor("a");
+
+    //     try {
+    //         displaySuccessIfTrue(bt2.contains("a"));
+    //     } catch (Exception e) {
+    //         displaySuccessIfTrue(false);
+    //     }
+    // }
 
     private static void test_Iterator() {
         System.out.println("Testing iterator...");        
