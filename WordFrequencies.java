@@ -49,6 +49,7 @@ public class WordFrequencies {
 		while (scan.hasNext()) {
 			String str = scan.next();
 			str = str.replaceAll("-", "");
+			str = str.replaceAll("'", "");
 			str = str.replaceAll("[^a-zA-Z0-9]", " "); //regex
 			String[] array = str.split(" ");
 			for (int j = 0; j < array.length; j ++) {
