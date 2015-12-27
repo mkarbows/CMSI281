@@ -9,14 +9,14 @@ public class NumberList implements java.util.Collection {
     private static int attempts = 0;
     private static int successes = 0;
 
-    private Long[] elements = new Long[16];
+    private Long[] elements = new Long[16]; // don't need to initialize this here
     private int currentSize = 0;
     private Object[] cArray = new Object[0];
 
     /** Constructs an empty number list. */
     //asymptotic performance = bigO(1)
     public NumberList(){ //        
-        this.elements = new Long[0];
+        this.elements = new Long[16]; //originally had it starting at size 0 so i couldn't add anything into it, so if i start it at anything other than 0 then there room to put the items in
     }
 
 
@@ -303,6 +303,9 @@ public class NumberList implements java.util.Collection {
 
         attempts = 0;
         successes = 0;
+
+        NumberList nl = new NumberList();
+        nl.add(5L);
 
         test_Constructors();
         test_add();
